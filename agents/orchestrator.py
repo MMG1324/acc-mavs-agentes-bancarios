@@ -158,6 +158,15 @@ class OrchestratorAgent:
             "limite",
             "límite",
             "pin",
+            "app",
+            "aplicación",
+            "banca móvil",
+            "banca movil",
+            "banca online",
+            "seguro",
+            "seguridad",
+            "fraude",
+            "phishing",
         ]
 
         if any(word in text for word in mortgage_keywords):
@@ -167,6 +176,7 @@ class OrchestratorAgent:
             return "customer_service"
 
         return "general"
+
 
     def _detect_intent(self, user_message: str) -> str:
         """
