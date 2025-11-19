@@ -6,6 +6,7 @@ from pathlib import Path
 
 from .mortgage_agent import MortgageAgent
 from .customer_agent import CustomerServiceAgent
+from agents.onboarding_agent import OnboardingAgent
 from config.llm import get_llm
 
 
@@ -22,6 +23,8 @@ class OrchestratorAgent:
     def __init__(self):
         self.mortgage_agent = MortgageAgent()
         self.customer_agent = CustomerServiceAgent()
+        self.onboarding_agent = OnboardingAgent()
+        self.current_customer = None # will store dict when verified
         self.llm = get_llm()
 
         # Cargar ejemplos de conversaciones para few-shot
@@ -190,21 +193,29 @@ class OrchestratorAgent:
     # ---------- Manejo del mensaje ----------
 
     def handle_message(self, user_message: str, history: List[Dict[str, Any]]) -> str:
+        # 0) Primero, mientras no se complete el onboarding, usar siempre ese agente
+        if not self.onboarding_agent.is_completed:
+            resp = self.onboarding_agent.handle_message(user_message)
+            # si acaba de verificarse un cliente, lo guardamos
+            if self.onboarding_agent.verified_customer is not None:
+                self.current_customer = self.onboarding_agent.verified_customer
+            return resp
+
+        # 1) Flujo normal: detección de intención
         intent = self._detect_intent(user_message)
 
         if intent == "mortgage":
             response = self.mortgage_agent.handle_message(user_message, history)
-            debug_prefix = "Orquestador → derivando al *Agente de Hipotecas*.\n\n"
+            debug_prefix = "🧠 Orquestador → derivando al *Agente de Hipotecas*.\n\n"
             return debug_prefix + response
 
         if intent == "customer_service":
             response = self.customer_agent.handle_message(user_message, history)
-            debug_prefix = "Orquestador → derivando al *Agente de Atención al Cliente*.\n\n"
+            debug_prefix = "🧠 Orquestador → derivando al *Agente de Atención al Cliente*.\n\n"
             return debug_prefix + response
 
-        # Respuesta general si no detectamos intención clara
         return (
-            "Orquestador (modo general):\n\n"
+            "🧠 Orquestador (modo general):\n\n"
             "Puedo ayudarte con:\n"
             "- Consultas sobre tu cuenta o tarjeta\n"
             "- Información y dudas sobre hipotecas\n\n"
@@ -212,3 +223,4 @@ class OrchestratorAgent:
             "- 'Quiero información sobre una hipoteca para comprar una casa'\n"
             "- 'Quiero ver el saldo de mi cuenta' o 'tengo un problema con mi tarjeta'\n"
         )
+
