@@ -11,8 +11,8 @@ def _load_faq_file() -> str:
     """
     Lee el contenido bruto del archivo de FAQs.
     """
-    root_dir = Path(__file__).resolve().parents[1]
-    faq_path = root_dir / "data" / "faqs_call_center.txt"
+    root_dir = Path(__file__).resolve().parents[2]
+    faq_path = root_dir /"datos"/"faqs_call_center.txt"
 
     if not faq_path.exists():
         raise FileNotFoundError(f"No se encontró el archivo de FAQs en: {faq_path}")

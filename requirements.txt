@@ -1,5 +1,6 @@
-streamlit
-langchain
-langchain-community
-pydantic
-
+transformers
+typing_extensions
+langgraph
+langchain_groq
+dotenv
+torch @ https://download.pytorch.org/whl/cpu/torch-2.5.1%2Bcpu-cp312-cp312-win_amd64.whl
