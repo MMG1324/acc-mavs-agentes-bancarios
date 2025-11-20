@@ -1,5 +1,4 @@
 from langchain_groq import ChatGroq
-from dotenv import load_dotenv
 import os
 
 os.environ["GROQ_API_KEY"] = "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"

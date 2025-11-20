@@ -1,11 +1,9 @@
 # hipoteca_groq.py
 from langchain_groq import ChatGroq
-from dotenv import load_dotenv
 import re
-import json
 import os
 
-load_dotenv()
+os.environ["GROQ_API_KEY"] = "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"
 
 llm = ChatGroq(
     api_key=os.getenv("GROQ_API_KEY"),
@@ -14,8 +12,7 @@ llm = ChatGroq(
 
 def extraer_datos_usuario(texto):
     """
-    Usa Groq para extraer tres números:
-    ahorro, precio, plazo.
+    Extracción de datos con Grok: ahorro, precio, plazo.
     Luego se validan con regex.
     """
     datos = {"ahorro": None, "precio_vivienda": None, "plazo_anos": None}
@@ -74,6 +71,16 @@ def experto_calculador_hipotecas(state):
     datos = extraer_datos_usuario(pregunta)
     cuota = calcular_cuota(datos)
 
-    state["output"] = f"La cuota mensual aproximada es {cuota} €."
+    ahorro = datos["ahorro"]
+    precio = datos["precio_vivienda"]
+    plazo = datos["plazo_anos"]
+
+    state["output"] = (
+        "Aquí tienes una estimación basada en los datos proporcionados:\n\n"
+        f"• Ahorro aportado: {ahorro:,.2f} €\n"
+        f"• Precio de la vivienda: {precio:,.2f} €\n"
+        f"• Plazo de la hipoteca: {plazo} años\n\n"
+        f"La cuota mensual aproximada sería de {cuota} €.\n\n"
+    )
 
     return state
